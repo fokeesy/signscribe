@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "signscribe"
+dynamic = ["version"]
+description = "Real-time ASL fingerspelling translator: hand and fingertip tracking, live recognition and sentence typing."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10,<3.13"
+authors = [{ name = "SignScribe contributors" }]
+keywords = ["asl", "sign-language", "fingerspelling", "hand-tracking", "mediapipe", "computer-vision", "accessibility"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video :: Capture",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=1.23,<2",  # MediaPipe 0.10.x is built against NumPy 1.x
+    # MediaPipe itself depends on opencv-contrib-python; naming it here avoids a second, conflicting cv2 wheel.
+    "opencv-contrib-python>=4.5",
+    "Pillow>=9.0",
+    # Releases after 0.10.21 dropped the bundled `mp.solutions.hands` API this project uses.
+    "mediapipe>=0.10.5,<0.10.22",
+]
+
+[project.optional-dependencies]
+typing = ["pynput>=1.7"]
+dev = ["pytest>=7.4", "ruff>=0.5", "build>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/fokeesy/signscribe"
+Issues = "https://github.com/fokeesy/signscribe/issues"
+Changelog = "https://github.com/fokeesy/signscribe/blob/main/CHANGELOG.md"
+
+[project.scripts]
+signscribe = "signscribe.cli:main"
+
+[project.gui-scripts]
+signscribe-gui = "signscribe.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "signscribe.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::UserWarning"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = [
+    "E501",   # long lines are formatted by hand where it helps readability
+    "SIM108", # ternary is not always clearer
+    "B905",   # zip(strict=) needs 3.10+ semantics we do not rely on
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "SIM117"]
