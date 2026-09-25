@@ -11,3 +11,5 @@ updates:
     ignore:
       # The project relies on the bundled mp.solutions.hands API; see pyproject.toml.
       - dependency-name: mediapipe
+      # MediaPipe 0.10.x is built against NumPy 1.x, so the <2 cap in pyproject.toml is intentional.
+      - dependency-name: numpy
