@@ -1,5 +1,5 @@
 # Runtime dependencies (the same list as pyproject.toml). Prefer `pip install -e .`.
-numpy>=1.23,<2
+numpy>=1.23,<3
 opencv-contrib-python>=4.5
 Pillow>=9.0
 mediapipe>=0.10.5,<0.10.22
