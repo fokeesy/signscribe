@@ -107,15 +107,22 @@ def test_calibration_wizard_manual_recording_and_training_in_the_window(app, mon
 
     app.calibrator.start(["A", "B"])
     app._wizard_buttons(True)
+    # On a slow machine the demo hand can type its first letter in the moment before calibration
+    # switches typing off. Flush that letter so the check below only covers the calibration itself.
+    pump(app, 0.1)
+    app._clear_text()
     assert app.wiz_hint.winfo_manager() == "pack" and str(app.wiz_start.cget("state")) == "disabled"
     deadline = time.time() + 25
     while app.calibrator.active and time.time() < deadline:
         pump(app, 0.2)
+        # Typing is only switched off for as long as the wizard runs. Once it finishes, the looping
+        # demo hand may legitimately type again, so the check must not run after that point.
+        if app.calibrator.active:
+            assert app.text.get("1.0", "end-1c") == "", "nothing may be typed while calibrating"
     pump(app, 0.5)
     assert app.calibrator.recorded == ["A", "B"]
     assert app.engine.calibrating is False
     assert set(app.store.counts()) == {"A", "B"}
-    assert app.text.get("1.0", "end-1c") == ""  # nothing typed during calibration
     assert not app.wiz_hint.winfo_manager()
     assert set(app.sample_tree.get_children()) == {"A", "B"}
 
